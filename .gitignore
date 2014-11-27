@@ -17,3 +17,7 @@
 
 # Ignore Spring files.
 /spring/*.pid
+
+erd.pdf
+
+/public/uploads/
