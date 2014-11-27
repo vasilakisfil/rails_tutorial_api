@@ -1,9 +1,17 @@
-# Ruby on Rails Tutorial: sample application
+# Ruby on Rails Tutorial with API: sample application
+
+[![circleci build](https://circleci.com/gh/vasilakisfil/rails_tutorial_api.svg?style=shield&circle-token=b3c068bc50b4672f403bbebe0c8dc4152cc275c4)](https://circleci.com/gh/vasilakisfil/rails_tutorial_api)
 
 This is the sample application for the
 [*Ruby on Rails Tutorial:
 Learn Web Development with Rails*](http://www.railstutorial.org/)
-by [Michael Hartl](http://www.michaelhartl.com/). You can use this reference implementation to help track down errors if you end up having trouble with code in the tutorial. In particular, as a first debugging check I suggest getting the test suite to pass on your local machine:
+by [Michael Hartl](http://www.michaelhartl.com/) **but with an API for the [Ember version](https://github.com/vasilakisfil/rails_tutorial_ember)**.
+
+It's deployed [here](https://rails-tutorial-api.herokuapp.com/).
+Ember version is deployed [here](https://ember-on-rails-tutorial.herokuapp.com) and there is a [blog post](https://labs.kollegorna.se/blog/2015/04/build-an-api-now/) about it
+
+You can use this reference implementation to help track down errors if you end up having trouble with code in the tutorial.
+In particular, as a first debugging check I suggest getting the test suite to pass on your local machine:
 
 ```
 $ cd /tmp
