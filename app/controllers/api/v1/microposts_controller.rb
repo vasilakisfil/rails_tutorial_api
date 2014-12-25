@@ -16,7 +16,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     return api_error(status: 404) if micropost.nil?
     #authorize micropost
 
-    render json: Api::V1::UserSerializer.new(micropost).to_json
+    render json: Api::V1::MicropostSerializer.new(micropost).to_json
   end
 
   def create
@@ -26,7 +26,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     micropost.save!
 
     render(
-      json: Api::V1::UserSerializer.new(micropost).to_json,
+      json: Api::V1::MicropostSerializer.new(micropost).to_json,
       status: 201,
       location: api_v1_micropost_path(micropost.id),
       serializer: Api::V1::MicropostSerializer
@@ -43,7 +43,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     end
 
     render(
-      json: Api::V1::UserSerializer.new(micropost).to_json,
+      json: Api::V1::MicropostSerializer.new(micropost).to_json,
       status: 200,
       location: api_v1_micropost_path(micropost.id),
       serializer: Api::V1::MicropostSerializer
