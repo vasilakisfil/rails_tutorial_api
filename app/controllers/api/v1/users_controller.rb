@@ -4,9 +4,19 @@ class Api::V1::UsersController < Api::V1::BaseController
 
     users = users.where(id: params['ids']) if params['ids']
 
+    if params[:page]
+      users = users.page(params[:page])
+      if params[:per_page]
+        users = users.per_page(params[:per_page])
+      end
+    end
+
     render(
       json: ActiveModel::ArraySerializer.new(
-        users, each_serializer: Api::V1::UserSerializer, root: 'users'
+        users,
+        each_serializer: Api::V1::UserSerializer,
+        root: 'users',
+        meta: meta_attributes(users)
       )
     )
   end
