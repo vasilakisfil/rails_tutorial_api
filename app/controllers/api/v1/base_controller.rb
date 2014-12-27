@@ -36,4 +36,15 @@ class Api::V1::BaseController < ApplicationController
   def sign_out_user
     sign_out :user
   end
+
+  def meta_attributes(object)
+    return {} if params[:page].blank?
+    {
+      current_page: object.current_page,
+      next_page: object.next_page,
+      prev_page: object.previous_page,
+      total_pages: object.total_pages,
+      total_count: object.total_entries
+    }
+  end
 end

@@ -2,11 +2,21 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def index
     microposts = Micropost.all
 
+    microposts = microposts.where(user_id: params[:user_id]) if params[:user_id]
+
+    if params[:page]
+      microposts = microposts.page(params[:page])
+      if params[:per_page]
+        microposts = microposts.per_page(params[:per_page])
+      end
+    end
+
     render(
       json: ActiveModel::ArraySerializer.new(
         microposts,
         each_serializer: Api::V1::MicropostSerializer,
-        root: 'microposts'
+        root: 'microposts',
+        meta: meta_attributes(microposts)
       )
     )
   end
