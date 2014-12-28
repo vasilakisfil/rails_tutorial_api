@@ -22,7 +22,7 @@ class Api::V1::BaseController < ApplicationController
     end
     head status: status and return if errors.empty?
 
-    render json: {errors: errors.full_messages}.to_json, status: status
+    render json: {errors: errors}.to_json, status: status
   end
 
   def not_found

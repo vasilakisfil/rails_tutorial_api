@@ -1,5 +1,7 @@
 # Ruby on Rails Tutorial: sample application
 
+![circleci build](https://circleci.com/gh/vasilakisfil/rails_tutorial_api.svg?style=shield&circle-token=b3c068bc50b4672f403bbebe0c8dc4152cc275c4)
+
 This is the sample application for the
 [*Ruby on Rails Tutorial:
 Learn Web Development with Rails*](http://www.railstutorial.org/)
