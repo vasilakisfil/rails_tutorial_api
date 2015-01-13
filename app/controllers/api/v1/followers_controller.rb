@@ -1,11 +1,8 @@
 class Api::V1::FollowersController < Api::V1::BaseController
   def index
-    if params[:user_id]
-      followers = User.find(params[:user_id]).followers
-    else
-      followers = User.all
-    end
+    return api_error(status: 422, errors: []) if params[:user_id].blank?
 
+    followers = User.find(params[:user_id]).followers
     followers = followers.where(id: params['ids']) if params['ids']
 
     if params[:page]
@@ -26,65 +23,39 @@ class Api::V1::FollowersController < Api::V1::BaseController
   end
 
   def show
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
+    follower = User.find_by(id: params[:id])
+    return api_error(status: 404) if follower.nil?
     #authorize user
 
-    render json: Api::V1::FollowerSerializer.new(user).to_json
+    render json: Api::V1::FollowerSerializer.new(follower).to_json
   end
-
+=begin
   def create
-    user = User.new(create_params)
-    return api_error(status: 422, errors: user.errors) unless user.valid?
+    return api_error(status: 422, errors: []) if params[:user_id].blank?
+    follower = User.find(params[:id])
+    user = User.find(params[:user_id])
 
-    user.save!
+    follower.follow(user)
 
     render(
-      json: Api::V1::FollowerSerializer.new(user).to_json,
+      json: Api::V1::FollowerSerializer.new(follower).to_json,
       status: 201,
-      location: api_v1_user_path(user.id)
-    )
-  end
-
-  def update
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
-    #authorize user
-
-    if !user.update_attributes(update_params)
-      return api_error(status: 422, errors: user.errors)
-    end
-
-    render(
-      json: Api::V1::FollowerSerializer.new(user).to_json,
-      status: 200,
-      location: api_v1_user_path(user.id),
-      serializer: Api::V1::FollowerSerializer
+      location: api_v1_follower_path(follower.id)
     )
   end
 
   def destroy
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
+    follower = User.find_by(id: params[:id])
+    return api_error(status: 404) if follower.nil?
     #authorize user
 
-    if !user.destroy
+    if !follower.destroy
       return api_error(status: 500)
     end
 
     head status: 204
   end
+=end
 
-  private
-
-  def create_params
-     params.require(:follower).permit(
-       :email, :password, :password_confirmation, :first_name, :last_name
-     )
-  end
-
-  def update_params
-    create_params
-  end
 end
 
