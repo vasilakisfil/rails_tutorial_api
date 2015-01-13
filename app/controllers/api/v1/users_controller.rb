@@ -1,6 +1,12 @@
 class Api::V1::UsersController < Api::V1::BaseController
   def index
-    users = User.all
+    if params[:follower_id]
+      users = User.find(params[:follower_id]).followers
+    elsif params[:following_id]
+      users = User.find(params[:following_id]).following
+    else
+      users = User.all
+    end
 
     users = users.where(id: params['ids']) if params['ids']
 
