@@ -38,7 +38,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def meta_attributes(object)
-    return {} if params[:page].blank?
+    return {total_count: object.count} if params[:page].blank?
     {
       current_page: object.current_page,
       next_page: object.next_page,
