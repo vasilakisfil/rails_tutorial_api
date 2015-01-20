@@ -76,7 +76,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
 
   def create_params
      params.require(:micropost).permit(
-       :email, :password, :password_confirmation, :first_name, :last_name
+       :content, :picture, :user_id
      )
   end
 

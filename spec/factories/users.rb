@@ -33,5 +33,15 @@ FactoryGirl.define do
     factory :admin do
       admin { true }
     end
+
+    factory :user_with_microposts do
+      transient do
+        posts_count 5
+      end
+
+      after(:create) do |user, evaluator|
+        create_list(:micropost, evaluator.posts_count, user: user)
+      end
+    end
   end
 end
