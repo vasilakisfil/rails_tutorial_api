@@ -79,16 +79,6 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   private
 
-  def create_params2
-    prms = params.require(:user).permit(
-      :email, :password, :password_confirmation, :name
-    ).clone
-    prms.delete(:password) if prms[:password].blank?
-    prms.delete(:password_confirmation) if prms[:password_confirmation].blank?
-
-    return prms
-  end
-
   def create_params
     params.require(:user).permit(
       :email, :password, :password_confirmation, :name

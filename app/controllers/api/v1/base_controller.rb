@@ -22,7 +22,7 @@ class Api::V1::BaseController < ApplicationController
     end
     head status: status and return if errors.empty?
 
-    render json: {errors: errors}.to_json, status: status
+    render json: jsonapi_format(errors).to_json, status: status
   end
 
   def not_found
@@ -46,5 +46,21 @@ class Api::V1::BaseController < ApplicationController
       total_pages: object.total_pages,
       total_count: object.total_entries
     }
+  end
+
+  private
+
+  #ember specific :/
+  def jsonapi_format(errors)
+    errors_hash = {}
+    errors.messages.each do |attribute, error|
+      array_hash = []
+      error.each do |e|
+        array_hash << {attribute: attribute, message: e}
+      end
+      errors_hash.merge!({ attribute => array_hash })
+    end
+
+    return errors_hash
   end
 end
