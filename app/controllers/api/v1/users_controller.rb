@@ -5,7 +5,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     elsif params[:following_id]
       users = User.find(params[:following_id]).following
     else
-      users = User.all
+      users = User.all.order(created_at: :asc)
     end
 
     users = users.where(id: params['ids']) if params['ids']
