@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       resources :users
       resources :microposts
       resources :feed, only: [:index]
+      resources :sessions, only: [:create]
     end
   end
 end

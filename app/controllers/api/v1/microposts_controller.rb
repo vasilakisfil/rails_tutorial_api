@@ -1,4 +1,6 @@
 class Api::V1::MicropostsController < Api::V1::BaseController
+  before_filter :authenticate_user!
+
   def index
     microposts = Micropost.all
 

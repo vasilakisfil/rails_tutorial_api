@@ -3,12 +3,12 @@ class Api::V1::BaseController < ApplicationController
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
-  #before_filter :authenticate_user!
   #after_filter :sign_out_user
 
-  #rescue_from ActiveRecord::RecordNotFound, with: :not_found
-  #rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  attr_accessor :current_user
   protected
 
   def render_unauthorized
@@ -46,6 +46,20 @@ class Api::V1::BaseController < ApplicationController
       total_pages: object.total_pages,
       total_count: object.total_entries
     }
+  end
+
+  def authenticate_user!
+    token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
+
+    puts token.inspect
+    user_email = options.blank?? nil : options[:user_email]
+    user = user_email && User.find_by(email: user_email)
+
+    if user && ActiveSupport::SecurityUtils.secure_compare(user.authentication_token, token)
+      @current_user = user
+    else
+      return render_unauthorized
+    end
   end
 
   private

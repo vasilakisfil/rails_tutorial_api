@@ -1,4 +1,6 @@
 class Api::V1::FeedController < Api::V1::BaseController
+  before_filter :authenticate_user!
+
   def index
     return api_error(status: 422, errors: []) if params[:user_id].blank?
 
