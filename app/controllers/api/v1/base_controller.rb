@@ -5,11 +5,17 @@ class Api::V1::BaseController < ApplicationController
   protect_from_forgery with: :null_session
   #after_filter :sign_out_user
 
+  before_action :destroy_session
+
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   attr_accessor :current_user
   protected
+
+  def destroy_session
+    request.session_options[:skip] = true
+  end
 
   def render_unauthorized
     response.headers['WWW-Authenticate'] = "Token realm=Application"
