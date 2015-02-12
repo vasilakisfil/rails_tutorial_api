@@ -22,6 +22,10 @@ class Api::V1::BaseController < ApplicationController
     render json: { error: 'Bad credentials' }, status: 401
   end
 
+  def user_not_authorized
+    render json: { error: 'not authorized' }, status: 403
+  end
+
   def api_error(status: 500, errors: [])
     unless Rails.env.production?
       puts errors.full_messages if errors.respond_to? :full_messages
@@ -33,10 +37,6 @@ class Api::V1::BaseController < ApplicationController
 
   def not_found
     return api_error(status: 404, errors: 'Not found')
-  end
-
-  def user_not_authorized
-    render_unauthorized
   end
 
   def sign_out_user
