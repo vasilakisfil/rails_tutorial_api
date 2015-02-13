@@ -2,9 +2,13 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   before_filter :authenticate_user!
 
   def index
-    microposts = Micropost.all
+    return api_error(status: 422) if params[:user_id].blank?
 
-    microposts = microposts.where(user_id: params[:user_id]) if params[:user_id]
+    if params[:feed]
+      microposts = User.find_by(id: params[:user_id]).feed
+    else
+      microposts = Micropost.where(user_id: params[:user_id])
+    end
 
     if params[:page]
       microposts = microposts.page(params[:page])
