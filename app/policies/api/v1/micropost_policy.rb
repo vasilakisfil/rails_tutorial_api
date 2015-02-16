@@ -8,6 +8,3 @@ class Api::V1::MicropostPolicy < Api::V1::ApplicationPolicy
   class Scope < Api::V1::ApplicationPolicy::Scope
   end
 end
-
-
-
