@@ -58,28 +58,44 @@ describe Api::V1::MicropostsController, type: :api do
   end
 
   context :update do
-    before do
-      create_and_sign_in_user
-      @micropost = FactoryGirl.create(:micropost)
-      @micropost.content = 'Another content'
+    context "without ownership" do
+      before do
+        create_and_sign_in_user
+        @micropost = FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
+        @micropost.content = 'Another content'
 
-      put api_v1_micropost_path(@micropost.id), micropost: @micropost.as_json, format: :json
+        put api_v1_micropost_path(@micropost.id), micropost: @micropost.as_json, format: :json
+      end
+
+      it 'returns the correct status' do
+        expect(last_response.status).to eql(403)
+      end
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
+    context "wih ownership" do
+      before do
+        user = create_and_sign_in_user
+        @micropost = FactoryGirl.create(:micropost, user: user)
+        @micropost.content = 'Another content'
 
-    it 'returns the correct location' do
-      expect(last_response.headers['Location'])
-        .to include(api_v1_micropost_path(@micropost.id))
-    end
+        put api_v1_micropost_path(@micropost.id), micropost: @micropost.as_json, format: :json
+      end
 
-    it 'returns the data in the body' do
-      micropost = Micropost.last!
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:micropost][:content]).to eql(@micropost.content)
-      expect(body[:micropost][:updated_at]).to eql(micropost.updated_at.iso8601)
+      it 'returns the correct status' do
+        expect(last_response.status).to eql(200)
+      end
+
+      it 'returns the correct location' do
+        expect(last_response.headers['Location'])
+          .to include(api_v1_micropost_path(@micropost.id))
+      end
+
+      it 'returns the data in the body' do
+        micropost = Micropost.last!
+        body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
+        expect(body[:micropost][:content]).to eql(@micropost.content)
+        expect(body[:micropost][:updated_at]).to eql(micropost.updated_at.iso8601)
+      end
     end
   end
 

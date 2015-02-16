@@ -52,7 +52,10 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def update
     micropost = Micropost.find_by(id: params[:id])
     return api_error(status: 404) if micropost.nil?
-    #authorize micropost
+
+    unless Api::V1::MicropostPolicy.new(current_user, micropost).update?
+      return api_error(status: 403)
+    end
 
     if !micropost.update_attributes(update_params)
       return api_error(status: 422, errors: micropost.errors)

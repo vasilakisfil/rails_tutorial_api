@@ -1,4 +1,4 @@
-class ApplicationPolicy
+class Api::V1::ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
