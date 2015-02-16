@@ -39,7 +39,7 @@ describe Api::V1::UsersController, type: :api do
 
   context :show do
     before do
-      #create_and_sign_in_user
+      create_and_sign_in_user
       FactoryGirl.create(:user)
       @user = User.last
 
@@ -60,7 +60,7 @@ describe Api::V1::UsersController, type: :api do
 
   context :update do
     before do
-      #create_and_sign_in_user
+      create_and_sign_in_user
       @user = FactoryGirl.create(:user)
       @name = 'Another name'
       @user.name = @name
@@ -87,7 +87,7 @@ describe Api::V1::UsersController, type: :api do
   context :delete do
     context 'when the resource does NOT exist' do
       before do
-        #create_and_sign_in_user
+        create_and_sign_in_user
         @user = FactoryGirl.create(:user)
         delete api_v1_user_path(rand(100..1000)), format: :json
       end
@@ -99,7 +99,7 @@ describe Api::V1::UsersController, type: :api do
 
     context 'when the resource does exist' do
       before do
-        #create_and_sign_in_user
+        create_and_sign_in_user
         @user = FactoryGirl.create(:user)
 
         delete api_v1_user_path(@user.id), format: :json

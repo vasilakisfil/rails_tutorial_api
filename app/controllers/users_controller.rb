@@ -21,9 +21,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       @user.send_activation_email
-      @user.activate
-      #flash[:info] = "Please check your email to activate your account."
-      flash[:info] = "You account has been activated, no need to check your mails."
+      flash[:info] = "Please check your email to activate your account."
+      #flash[:info] = "You account has been activated, no need to check your mails."
       redirect_to root_url
     else
       render 'new'

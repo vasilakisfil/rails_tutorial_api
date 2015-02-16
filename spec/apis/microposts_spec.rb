@@ -3,10 +3,10 @@ require 'rails_helper'
 describe Api::V1::MicropostsController, type: :api do
   context :index do
     before do
-      #create_and_sign_in_micropost
-      5.times{ FactoryGirl.create(:micropost) }
+      user = create_and_sign_in_user
+      5.times{ FactoryGirl.create(:micropost, user: user) }
 
-      get api_v1_microposts_path, format: :json
+      get api_v1_microposts_path, user_id: user.id, format: :json
     end
     it 'returns the correct status' do
       expect(last_response.status).to eql(200)
@@ -19,8 +19,7 @@ describe Api::V1::MicropostsController, type: :api do
 
   context :create do
     before do
-      #create_and_sign_in_micropost
-      @user = FactoryGirl.create(:user)
+      @user = create_and_sign_in_user
       micropost = FactoryGirl.attributes_for(:micropost).merge(user_id: @user.id)
 
       post api_v1_microposts_path, micropost: micropost.as_json, format: :json
@@ -41,7 +40,7 @@ describe Api::V1::MicropostsController, type: :api do
 
   context :show do
     before do
-      #create_and_sign_in_micropost
+      create_and_sign_in_user
       @micropost = FactoryGirl.create(:micropost)
 
       get api_v1_micropost_path(@micropost.id), format: :json
@@ -60,7 +59,7 @@ describe Api::V1::MicropostsController, type: :api do
 
   context :update do
     before do
-      #create_and_sign_in_micropost
+      create_and_sign_in_user
       @micropost = FactoryGirl.create(:micropost)
       @micropost.content = 'Another content'
 
@@ -87,7 +86,7 @@ describe Api::V1::MicropostsController, type: :api do
   context :delete do
     context 'when the resource does NOT exist' do
       before do
-        #create_and_sign_in_micropost
+        create_and_sign_in_user
         @micropost = FactoryGirl.create(:micropost)
         delete api_v1_micropost_path(rand(100..1000)), format: :json
       end
@@ -99,7 +98,7 @@ describe Api::V1::MicropostsController, type: :api do
 
     context 'when the resource does exist' do
       before do
-        #create_and_sign_in_micropost
+        create_and_sign_in_user
         @micropost = FactoryGirl.create(:micropost)
 
         delete api_v1_micropost_path(@micropost.id), format: :json
