@@ -10,12 +10,9 @@ class Api::V1::MicropostsController < Api::V1::BaseController
       microposts = Micropost.where(user_id: params[:user_id])
     end
 
-    if params[:page]
-      microposts = microposts.page(params[:page])
-      if params[:per_page]
-        microposts = microposts.per_page(params[:per_page])
-      end
-    end
+    microposts = apply_filters(microposts, params)
+
+    microposts = paginate(microposts)
 
     render(
       json: ActiveModel::ArraySerializer.new(

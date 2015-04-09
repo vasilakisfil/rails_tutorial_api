@@ -1,5 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   include Pundit
+  include ActiveHashRelation
+
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
@@ -43,8 +45,17 @@ class Api::V1::BaseController < ApplicationController
     sign_out :user
   end
 
+  def paginate(resource)
+    resource = resource.page(params[:page] || 1)
+    if params[:per_page]
+      resource = resource.per_page(params[:per_page])
+    end
+
+    return resource
+  end
+
+  #expects pagination!
   def meta_attributes(object)
-    return {total_count: object.count} if params[:page].blank?
     {
       current_page: object.current_page,
       next_page: object.next_page,

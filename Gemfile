@@ -22,6 +22,7 @@ gem 'sdoc',                    '~> 0.4.0', group: :doc
 
 gem 'pg'
 gem 'rack-cors', :require => 'rack/cors'
+gem 'active_hash_relation', github: 'kollegorna/active_hash_relation'
 
 #api related
 gem 'pundit', '~> 0.3.0'
@@ -41,7 +42,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'annotate', git: 'git@github.com:vasilakisfil/annotate_models.git', branch: 'classified_sort'
+  gem 'annotate', git: 'git@github.com:ctran/annotate_models.git', branch: 'develop'
   gem 'erd'
 end
 
@@ -58,4 +59,5 @@ end
 group :production do
   gem 'rails_12factor', '0.0.2'
   gem 'unicorn',        '4.8.3'
+  gem 'newrelic_rpm'
 end
