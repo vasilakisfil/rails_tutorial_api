@@ -10,14 +10,9 @@ class Api::V1::UsersController < Api::V1::BaseController
       users = User.all.order(created_at: :asc)
     end
 
-    users = users.where(id: params['ids']) if params['ids']
+    users = apply_filters(users, params)
 
-    if params[:page]
-      users = users.page(params[:page])
-      if params[:per_page]
-        users = users.per_page(params[:per_page])
-      end
-    end
+    users = paginate(users)
 
     render(
       json: ActiveModel::ArraySerializer.new(

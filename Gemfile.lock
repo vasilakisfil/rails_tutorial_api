@@ -1,11 +1,17 @@
 GIT
-  remote: git@github.com:vasilakisfil/annotate_models.git
-  revision: 601de0087760243818520ca67f288263e1e7e229
-  branch: classified_sort
+  remote: git://github.com/kollegorna/active_hash_relation.git
+  revision: f6308101800411df3142a232bcbc756bacf88aae
   specs:
-    annotate (2.6.5)
-      activerecord (>= 2.3.0)
-      rake (>= 0.8.7)
+    active_hash_relation (0.0.2)
+
+GIT
+  remote: git@github.com:ctran/annotate_models.git
+  revision: bc2662b4c27f0d46d54685cb57a600535291f14c
+  branch: develop
+  specs:
+    annotate (2.6.8)
+      activerecord (>= 3.2, <= 4.3)
+      rake (~> 10.4)
 
 GEM
   remote: https://rubygems.org/
@@ -301,6 +307,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  active_hash_relation!
   active_model_serializers (= 0.9.2)
   annotate!
   arel (~> 6.0.0)

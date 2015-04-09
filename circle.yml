@@ -1,0 +1,6 @@
+deployment:
+  production:
+    branch: master
+    commands:
+      - git push git@heroku.com:rails-tutorial-api.git $CIRCLE_SHA1:refs/heads/master
+      - heroku run rake db:migrate --app rails-tutorial-api
