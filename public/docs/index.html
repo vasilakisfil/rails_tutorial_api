@@ -55,7 +55,7 @@
 <p>Welcome to rails tutorial API.
 The implementation of the API can be found <a href="https://github.com/vasilakisfil/rails_tutorial_api">here</a>. Using this API an Ember application is also built, found <a href="https://github.com/vasilakisfil/rails_tutorial_ember">here</a>.</p>
 
-<p>The following documentation the V1 API.</p>
+<p>The following documents the V1 API.</p>
 
           <h1 id="overview">Overview</h1>
 
@@ -230,13 +230,9 @@ For some resources, you can also set a custom page size up to 100 with the <code
 <pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
 <span class="na">Date</span><span class="p">:</span> <span class="s">Mon, 01 Jul 2013 17:27:06 GMT</span>
 <span class="na">Status</span><span class="p">:</span> <span class="s">200 OK</span>
-<span class="na">X-RateLimit-Limit</span><span class="p">:</span> <span class="s">60</span>
-<span class="na">X-RateLimit-Remaining</span><span class="p">:</span> <span class="s">56</span>
-<span class="na">X-RateLimit-Reset</span><span class="p">:</span> <span class="s">1372700873</span>
+<span class="na">X-Ratelimit-Limit</span><span class="p">:</span> <span class="s">100000</span>
+<span class="na">X-Ratelimit-Remaining</span><span class="p">:</span> <span class="s">99994</span>
 </code></pre>
-
-<p>For unauthenticated requests there is no limit currently.
-However, there is a soft limit for authenticated requests, meaning that even if you pass the limit you will probably still be able to send more requests.</p>
 
 <p>You can check the returned HTTP headers of any API request to see your current rate limit status.</p>
 
@@ -282,6 +278,13 @@ Although there are no hard limits, you should follow the limits defined on the A
 
 <p>In each GET request that acts upon resources, there is an extra field in the response under &ldquo;meta&rdquo; root element.
 It includes, the current requested page, next page, previous page, total pages and the total number of resources under the given params.</p>
+
+<h2 id="other-information">Other information</h2>
+
+<p>When requesting a list of resources, default sorting is descending by creation datetime.</p>
+
+<p>For all collection endpoints, active_hash_relation has been used which means you have plenty
+options to filter </p>
 
           <h1 id="users">Users</h1>
 
@@ -585,7 +588,188 @@ A user can create only micropost with her own <code class="prettyprint">user_id<
 
 <p>You get back the deleted micropost.</p>
 
-          
+          <h1 id="followers">Followers</h1>
+
+<h2 id="list-followers-for-a-specific-user">List Followers for a specific User</h2>
+<pre><code class="highlight http"><span class="nf">GET</span> <span class="nn">/api/v1/users/1/links/followers</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">4567</span>
+<span class="s">{</span>
+<span class="s">  "following":[</span>
+<span class="s">    {</span>
+<span class="s">      "id":1,</span>
+<span class="s">      "email":"example-88@railstutorial.org",</span>
+<span class="s">      "name":"Kenna Ondricka",</span>
+<span class="s">      "activated":true,</span>
+<span class="s">      "created_at":"2015-01-13T20:35:47Z",</span>
+<span class="s">      "updated_at":"2015-02-02T22:09:50Z",</span>
+<span class="s">      "micropost_ids":[],</span>
+<span class="s">      "following_ids":[],</span>
+<span class="s">      "follower_ids":[]</span>
+<span class="s">    },</span>
+<span class="s">    {</span>
+<span class="s">      "id":1,</span>
+<span class="s">      "email":"example-89@railstutorial.org",</span>
+<span class="s">      "name":"Della Oberbrunner PhD",</span>
+<span class="s">      "activated":true,</span>
+<span class="s">      "created_at":"2015-01-13T20:35:47Z",</span>
+<span class="s">      "updated_at":"2015-02-02T22:09:50Z",</span>
+<span class="s">      "micropost_ids":[],</span>
+<span class="s">      "following_ids":[],</span>
+<span class="s">      "follower_ids":[]</span>
+<span class="s">    }</span>
+<span class="s">  ],</span>
+<span class="s">  "meta":{</span>
+<span class="s">    "current_page":1,</span>
+<span class="s">    "next_page":2,</span>
+<span class="s">    "prev_page":null,</span>
+<span class="s">    "total_pages":10,</span>
+<span class="s">    "total_count":300</span>
+<span class="s">  }</span>
+<span class="s">}</span>
+</code></pre>
+
+<p>You can GET all users followers in /api/v1/users/:id/followers.
+It doesn&rsquo;t require authentication.</p>
+
+<h2 id="update-followers-for-a-user">Update Followers for a User</h2>
+<pre><code class="highlight http"><span class="nf">PUT</span> <span class="nn">/api/v1/users/1/followers</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+
+{
+  "follower_ids": [2,3,4,5,6,7]
+}
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">OK</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">4567</span>
+</code></pre>
+
+<p>You can update a user&rsquo;s followers sending a POST to <code class="prettyprint">/api/v1/users/:id/followers</code> with the follower_ids.</p>
+
+<h2 id="get-a-user&#39;s-follower">Get a user&rsquo;s follower</h2>
+<pre><code class="highlight http"><span class="nf">GET</span> <span class="nn">/api/v1/users/1/followers/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">OK</span>
+</code></pre>
+
+<p>It actually helps you figure out if a user if a follower for another user or not.
+If the follower you check is not a follower to the user then you get back a 404.</p>
+
+<h2 id="create-a-follower-for-a-user">Create a Follower for a User</h2>
+<pre><code class="highlight http"><span class="nf">POST</span> <span class="nn">/api/v1/users/1/followers/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+</code></pre>
+
+<p>If the follower is already there you get back a 304.</p>
+
+<h2 id="destroy-a-user">Destroy a User</h2>
+<pre><code class="highlight http"><span class="nf">DELETE</span> <span class="nn">/api/v1/users/1/links/followers/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+
+<p>If the follower has already been deleted or was never there you get back a 304.</p>
+
+          <h1 id="followings">Followings</h1>
+
+<h2 id="list-followings-for-a-specific-user">List Followings for a specific User</h2>
+<pre><code class="highlight http"><span class="nf">GET</span> <span class="nn">/api/v1/users/1/links/followings</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">4567</span>
+<span class="s">{</span>
+<span class="s">  "following":[</span>
+<span class="s">    {</span>
+<span class="s">      "id":1,</span>
+<span class="s">      "email":"example-88@railstutorial.org",</span>
+<span class="s">      "name":"Kenna Ondricka",</span>
+<span class="s">      "activated":true,</span>
+<span class="s">      "created_at":"2015-01-13T20:35:47Z",</span>
+<span class="s">      "updated_at":"2015-02-02T22:09:50Z",</span>
+<span class="s">      "micropost_ids":[],</span>
+<span class="s">      "following_ids":[],</span>
+<span class="s">      "follower_ids":[]</span>
+<span class="s">    },</span>
+<span class="s">    {</span>
+<span class="s">      "id":1,</span>
+<span class="s">      "email":"example-89@railstutorial.org",</span>
+<span class="s">      "name":"Della Oberbrunner PhD",</span>
+<span class="s">      "activated":true,</span>
+<span class="s">      "created_at":"2015-01-13T20:35:47Z",</span>
+<span class="s">      "updated_at":"2015-02-02T22:09:50Z",</span>
+<span class="s">      "micropost_ids":[],</span>
+<span class="s">      "following_ids":[],</span>
+<span class="s">      "follower_ids":[]</span>
+<span class="s">    }</span>
+<span class="s">  ],</span>
+<span class="s">  "meta":{</span>
+<span class="s">    "current_page":1,</span>
+<span class="s">    "next_page":2,</span>
+<span class="s">    "prev_page":null,</span>
+<span class="s">    "total_pages":10,</span>
+<span class="s">    "total_count":300</span>
+<span class="s">  }</span>
+<span class="s">}</span>
+</code></pre>
+
+<p>You can GET all users followings in /api/v1/users/:id/followings.
+It doesn&rsquo;t require authentication.</p>
+
+<h2 id="update-followings-for-a-user">Update Followings for a User</h2>
+<pre><code class="highlight http"><span class="nf">PUT</span> <span class="nn">/api/v1/users/1/followings</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+
+{
+  "following_ids": [2,3,4,5,6,7]
+}
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">OK</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">4567</span>
+</code></pre>
+
+<p>You can update a user&rsquo;s followings sending a POST to <code class="prettyprint">/api/v1/users/:id/followings</code> with the following_ids.</p>
+
+<h2 id="get-a-user&#39;s-following">Get a user&rsquo;s following</h2>
+<pre><code class="highlight http"><span class="nf">GET</span> <span class="nn">/api/v1/users/1/followings/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">204</span> <span class="ne">OK</span>
+</code></pre>
+
+<p>It actually helps you figure out if a user if a following for another user or not.
+If the following you check is not a following to the user then you get back a 404.</p>
+
+<h2 id="create-a-follower-for-a-user">Create a Follower for a User</h2>
+<pre><code class="highlight http"><span class="nf">POST</span> <span class="nn">/api/v1/users/1/followings/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+<pre><code class="highlight http"><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+</code></pre>
+
+<p>If the following is already there you get back a 304.</p>
+
+<h2 id="destroy-a-user">Destroy a User</h2>
+<pre><code class="highlight http"><span class="nf">DELETE</span> <span class="nn">/api/v1/users/1/links/followings/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">User-Agent</span><span class="p">:</span> <span class="s">MyClient/1.0.0</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre>
+
+<p>If the following has already been deleted or was never there you get back a 304.</p>
+
       </div>
       <div class="dark-box">
           <div class="lang-selector">

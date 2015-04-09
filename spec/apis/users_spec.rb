@@ -60,8 +60,8 @@ describe Api::V1::UsersController, type: :api do
 
   context :update do
     before do
-      create_and_sign_in_user
       @user = FactoryGirl.create(:user)
+      sign_in(@user)
       @name = 'Another name'
       @user.name = @name
       put api_v1_user_path(@user.id), user: @user.as_json, format: :json
@@ -87,8 +87,8 @@ describe Api::V1::UsersController, type: :api do
   context :delete do
     context 'when the resource does NOT exist' do
       before do
-        create_and_sign_in_user
-        @user = FactoryGirl.create(:user)
+        @user = create_and_sign_in_user
+
         delete api_v1_user_path(rand(100..1000)), format: :json
       end
 
@@ -99,8 +99,7 @@ describe Api::V1::UsersController, type: :api do
 
     context 'when the resource does exist' do
       before do
-        create_and_sign_in_user
-        @user = FactoryGirl.create(:user)
+        @user = create_and_sign_in_user
 
         delete api_v1_user_path(@user.id), format: :json
       end

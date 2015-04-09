@@ -14,6 +14,8 @@ class Api::V1::UsersController < Api::V1::BaseController
 
     users = paginate(users)
 
+    users = policy_scope(users)
+
     render(
       json: ActiveModel::ArraySerializer.new(
         users,
@@ -25,11 +27,10 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def show
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
-    #authorize user
+    user = User.find(params[:id])
+    authorize user
 
-    render json: Api::V1::UserSerializer.new(user).to_json
+    render(json: Api::V1::UserSerializer.new(user).to_json)
   end
 
   def create
@@ -47,9 +48,8 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def update
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
-    #authorize user
+    user = User.find(params[:id])
+    authorize user
 
     if !user.update_attributes(update_params)
       return api_error(status: 422, errors: user.errors)
@@ -64,9 +64,8 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def destroy
-    user = User.find_by(id: params[:id])
-    return api_error(status: 404) if user.nil?
-    #authorize user
+    user = User.find(params[:id])
+    authorize user
 
     if !user.destroy
       return api_error(status: 500)

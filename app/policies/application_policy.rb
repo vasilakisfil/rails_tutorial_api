@@ -1,4 +1,4 @@
-class Api::V1::ApplicationPolicy
+class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
@@ -39,8 +39,7 @@ class Api::V1::ApplicationPolicy
     end
 
     def resolve
-      scope
+      scope.none
     end
   end
 end
-

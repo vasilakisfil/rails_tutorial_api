@@ -2,10 +2,15 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   before_filter :authenticate_user!
 
   def index
-    return api_error(status: 422) if params[:user_id].blank?
 
+    # ember optimization
+    # we could have another point for the feed but then we would have some microposts
+    # 2 times in browser's memory
     if params[:feed]
-      microposts = User.find_by(id: params[:user_id]).feed
+      return api_error(status: 422) if params[:feed_user_id].blank?
+      return unauthorized! unless current_user.id == params[:feed_user_id].to_i
+
+      microposts = User.find_by(id: params[:feed_user_id]).feed
     else
       microposts = Micropost.where(user_id: params[:user_id])
     end
@@ -13,6 +18,8 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     microposts = apply_filters(microposts, params)
 
     microposts = paginate(microposts)
+
+    microposts = policy_scope(microposts)
 
     render(
       json: ActiveModel::ArraySerializer.new(
@@ -25,9 +32,8 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   end
 
   def show
-    micropost = Micropost.find_by(id: params[:id])
-    return api_error(status: 404) if micropost.nil?
-    #authorize micropost
+    micropost = Micropost.find(params[:id])
+    authorize micropost
 
     render json: Api::V1::MicropostSerializer.new(micropost).to_json
   end
@@ -47,12 +53,9 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   end
 
   def update
-    micropost = Micropost.find_by(id: params[:id])
-    return api_error(status: 404) if micropost.nil?
+    micropost = Micropost.find(params[:id])
 
-    unless Api::V1::MicropostPolicy.new(current_user, micropost).update?
-      return api_error(status: 403)
-    end
+    authorize micropost
 
     if !micropost.update_attributes(update_params)
       return api_error(status: 422, errors: micropost.errors)
@@ -67,9 +70,9 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   end
 
   def destroy
-    micropost = Micropost.find_by(id: params[:id])
-    return api_error(status: 404) if micropost.nil?
-    #authorize micropost
+    micropost = Micropost.find(params[:id])
+
+    authorize micropost
 
     if !micropost.destroy
       return api_error(status: 500)

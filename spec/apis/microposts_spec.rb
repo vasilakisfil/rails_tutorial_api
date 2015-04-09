@@ -114,8 +114,8 @@ describe Api::V1::MicropostsController, type: :api do
 
     context 'when the resource does exist' do
       before do
-        create_and_sign_in_user
-        @micropost = FactoryGirl.create(:micropost)
+        user = create_and_sign_in_user
+        @micropost = FactoryGirl.create(:micropost, user: user)
 
         delete api_v1_micropost_path(@micropost.id), format: :json
       end
