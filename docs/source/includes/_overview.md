@@ -159,13 +159,9 @@ For some resources, you can also set a custom page size up to 100 with the `?per
 HTTP/1.1 200 OK
 Date: Mon, 01 Jul 2013 17:27:06 GMT
 Status: 200 OK
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 56
-X-RateLimit-Reset: 1372700873
+X-Ratelimit-Limit: 100000
+X-Ratelimit-Remaining: 99994
 ```
-
-For unauthenticated requests there is no limit currently.
-However, there is a soft limit for authenticated requests, meaning that even if you pass the limit you will probably still be able to send more requests.
 
 You can check the returned HTTP headers of any API request to see your current rate limit status.
 
@@ -215,4 +211,10 @@ Content-Length: 4567
 In each GET request that acts upon resources, there is an extra field in the response under "meta" root element.
 It includes, the current requested page, next page, previous page, total pages and the total number of resources under the given params.
 
+
+## Other information
+When requesting a list of resources, default sorting is descending by creation datetime.
+
+For all collection endpoints, active_hash_relation has been used which means you have plenty
+options to filter 
 

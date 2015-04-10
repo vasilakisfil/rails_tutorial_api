@@ -5,12 +5,11 @@ class Api::V1::BaseController < ApplicationController
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
-  #after_filter :sign_out_user
 
   before_action :destroy_session
 
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found
-  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found!
+  rescue_from Pundit::NotAuthorizedError, with: :unauthorized!
 
   attr_accessor :current_user
   protected
@@ -19,13 +18,21 @@ class Api::V1::BaseController < ApplicationController
     request.session_options[:skip] = true
   end
 
-  def render_unauthorized
+  def unauthenticated!
     response.headers['WWW-Authenticate'] = "Token realm=Application"
     render json: { error: 'Bad credentials' }, status: 401
   end
 
-  def user_not_authorized
+  def unauthorized!
     render json: { error: 'not authorized' }, status: 403
+  end
+
+  def invalid_resource!(errors = [])
+    api_error(status: 422, errors: errors)
+  end
+
+  def not_found!
+    return api_error(status: 404, errors: 'Not found')
   end
 
   def api_error(status: 500, errors: [])
@@ -35,14 +42,6 @@ class Api::V1::BaseController < ApplicationController
     head status: status and return if errors.empty?
 
     render json: jsonapi_format(errors).to_json, status: status
-  end
-
-  def not_found
-    return api_error(status: 404, errors: 'Not found')
-  end
-
-  def sign_out_user
-    sign_out :user
   end
 
   def paginate(resource)
@@ -74,7 +73,7 @@ class Api::V1::BaseController < ApplicationController
     if user && ActiveSupport::SecurityUtils.secure_compare(user.authentication_token, token)
       @current_user = user
     else
-      return render_unauthorized
+      return unauthenticated!
     end
   end
 
@@ -82,6 +81,7 @@ class Api::V1::BaseController < ApplicationController
 
   #ember specific :/
   def jsonapi_format(errors)
+    return errors if errors.is_a? String
     errors_hash = {}
     errors.messages.each do |attribute, error|
       array_hash = []

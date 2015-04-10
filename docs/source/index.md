@@ -12,7 +12,8 @@ includes:
   - overview
   - users
   - microposts
-  - feed
+  - followers
+  - followings
 
 search: true
 ---
@@ -23,4 +24,4 @@ Welcome to rails tutorial API.
 The implementation of the API can be found [here](https://github.com/vasilakisfil/rails_tutorial_api). Using this API an Ember application is also built, found [here](https://github.com/vasilakisfil/rails_tutorial_ember).
 
 
-The following documentation the V1 API.
+The following documents the V1 API.

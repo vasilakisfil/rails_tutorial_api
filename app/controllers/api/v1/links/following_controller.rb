@@ -5,6 +5,8 @@ class Api::V1::Links::FollowingController < Api::V1::BaseController
   def index
     following = User.find(params[:user_id]).following
 
+    following = paginate(following)
+
     render(
       json: ActiveModel::ArraySerializer.new(
         following,
@@ -17,6 +19,8 @@ class Api::V1::Links::FollowingController < Api::V1::BaseController
 
   #collection
   def update
+    authorize User.find(params[:user_id])
+
     User.find(params[:user_id]).following = params[:following_ids]
 
     head status: 204
@@ -33,6 +37,8 @@ class Api::V1::Links::FollowingController < Api::V1::BaseController
 
   #member
   def create
+    authorize User.find(params[:user_id])
+
     return head(status: 304) if User.find(params[:user_id]).following.find_by(id: params[:id])
 
     User.find(params[:user_id]).follow(User.find(params[:id]))
@@ -42,6 +48,8 @@ class Api::V1::Links::FollowingController < Api::V1::BaseController
 
   #member
   def destroy
+    authorize User.find(params[:user_id])
+
     unless User.find(params[:user_id]).following.find_by(id: params[:id])
       return head(status: 304)
     end
