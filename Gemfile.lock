@@ -17,6 +17,12 @@ GIT
     active_hash_relation (0.0.2)
 
 GIT
+  remote: git://github.com/kollegorna/rspec-api_helpers.git
+  revision: 026ca8cfae4188df591b48ccdfd843a94beee3df
+  specs:
+    rspec-api_helpers (0.0.1)
+
+GIT
   remote: git@github.com:ctran/annotate_models.git
   revision: bc2662b4c27f0d46d54685cb57a600535291f14c
   branch: develop
@@ -356,6 +362,7 @@ DEPENDENCIES
   rails (~> 4.2.0)
   rails_12factor (= 0.0.2)
   redis-throttle!
+  rspec-api_helpers!
   rspec-rails (~> 3.1.0)
   sass-rails (~> 5.0.0.beta1)
   sdoc (~> 0.4.0)

@@ -3,58 +3,58 @@ require 'rails_helper'
 describe Api::V1::UsersController, type: :api do
   context :index do
     before do
-      #create_and_sign_in_user
-      @resources_count = 5
       5.times{ FactoryGirl.create(:user) }
 
       get api_v1_users_path, format: :json
     end
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
-    it 'returns the correct number of data in the body' do
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:users].length).to eql(@resources_count)
-    end
+
+    it_returns_status(200)
+
+    it_returns_resources(root: 'users', number: 5)
   end
 
   context :create do
     before do
       #create_and_sign_in_user
-      user = FactoryGirl.attributes_for(:user)
-      post api_v1_users_path, user: user.as_json, format: :json
+      @user = FactoryGirl.attributes_for(:user)
+      post api_v1_users_path, user: @user.as_json, format: :json
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(201)
-    end
+    it_returns_status(201)
 
-    it 'returns the data in the body' do
-      user = User.last
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:user][:name]).to eql(user.name)
-      expect(body[:user][:updated_at]).to eql(user.updated_at.iso8601)
-    end
+    it_returns_attributes(resource: 'user', model: '@user', only: [
+      :email, :name
+    ])
+
+    it_returns_more_attributes(
+      resource: 'user',
+      model: 'User.last!',
+      only: [:updated_at, :created_at],
+      modifier: 'iso8601'
+    )
   end
 
   context :show do
     before do
       create_and_sign_in_user
       FactoryGirl.create(:user)
-      @user = User.last
+      @user = User.last!
 
       get api_v1_user_path(@user.id), format: :json
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
+    it_returns_status(200)
 
-    it 'returns the data in the body' do
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:user][:name]).to eql(@user.name)
-      expect(body[:user][:updated_at]).to eql(@user.updated_at.iso8601)
-    end
+    it_returns_attributes(resource: 'user', model: '@user', only: [
+      :email, :name, :admin, :activated, :id
+    ])
+
+    it_returns_more_attributes(
+      resource: 'user',
+      model: '@user',
+      only: [:updated_at, :created_at],
+      modifier: 'iso8601'
+    )
   end
 
 
@@ -67,21 +67,20 @@ describe Api::V1::UsersController, type: :api do
       put api_v1_user_path(@user.id), user: @user.as_json, format: :json
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
+    it_returns_status(200)
 
-    it 'returns the correct location' do
-      expect(last_response.headers['Location'])
-        .to include(api_v1_user_path(@user.id))
-    end
+    it_returns_attributes(resource: 'user', model: '@user', only: [
+      :email, :name, :admin, :activated, :id
+    ])
 
-    it 'returns the data in the body' do
-      user = User.last
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:user][:name]).to eql(@name)
-      expect(body[:user][:updated_at]).to eql(user.updated_at.iso8601)
-    end
+    it_returns_more_attributes(
+      resource: 'user',
+      model: '@user',
+      only: [:updated_at, :created_at],
+      modifier: 'iso8601'
+    )
+
+    it_includes_in_headers({Location: 'api_v1_user_path(@user.id)'})
   end
 
   context :delete do
@@ -92,9 +91,7 @@ describe Api::V1::UsersController, type: :api do
         delete api_v1_user_path(rand(100..1000)), format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(404)
-      end
+      it_returns_status(404)
     end
 
     context 'when the resource does exist' do
@@ -104,9 +101,7 @@ describe Api::V1::UsersController, type: :api do
         delete api_v1_user_path(@user.id), format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(204)
-      end
+      it_returns_status(204)
 
       it 'actually deletes the resource' do
         expect(User.find_by(id: @user.id)).to eql(nil)

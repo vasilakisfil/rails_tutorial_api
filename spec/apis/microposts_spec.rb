@@ -8,34 +8,32 @@ describe Api::V1::MicropostsController, type: :api do
 
       get api_v1_microposts_path, user_id: user.id, format: :json
     end
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
-    it 'returns the correct number of data in the body' do
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:microposts].length).to eql(5)
-    end
+
+    it_returns_status(200)
+
+    it_returns_resources(root: 'microposts', number: 5)
   end
 
   context :create do
     before do
       @user = create_and_sign_in_user
-      micropost = FactoryGirl.attributes_for(:micropost).merge(user_id: @user.id)
+      @micropost = FactoryGirl.attributes_for(:micropost).merge(user_id: @user.id)
 
-      post api_v1_microposts_path, micropost: micropost.as_json, format: :json
+      post api_v1_microposts_path, micropost: @micropost.as_json, format: :json
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(201)
-    end
+    it_returns_status(201)
 
-    it 'returns the data in the body' do
-      micropost = Micropost.last!
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:micropost][:content]).to eql(micropost.content)
-      expect(body[:micropost][:updated_at]).to eql(micropost.updated_at.iso8601)
-      expect(body[:micropost][:user_id]).to eql(@user.id)
-    end
+    it_returns_attributes(resource: 'micropost', model: '@micropost', only: [
+      :content, :user_id
+    ])
+
+    it_returns_more_attributes(
+      resource: 'micropost',
+      model: 'Micropost.last!',
+      only: [:updated_at, :created_at],
+      modifier: 'iso8601'
+    )
   end
 
   context :show do
@@ -46,15 +44,18 @@ describe Api::V1::MicropostsController, type: :api do
       get api_v1_micropost_path(@micropost.id), format: :json
     end
 
-    it 'returns the correct status' do
-      expect(last_response.status).to eql(200)
-    end
+    it_returns_status(200)
 
-    it 'returns the data in the body' do
-      body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-      expect(body[:micropost][:content]).to eql(@micropost.content)
-      expect(body[:micropost][:updated_at]).to eql(@micropost.updated_at.iso8601)
-    end
+    it_returns_attributes(resource: 'micropost', model: '@micropost', only: [
+      :content, :user_id
+    ])
+
+    it_returns_more_attributes(
+      resource: 'micropost',
+      model: 'Micropost.last!',
+      only: [:updated_at, :created_at],
+      modifier: 'iso8601'
+    )
   end
 
   context :update do
@@ -67,9 +68,7 @@ describe Api::V1::MicropostsController, type: :api do
         put api_v1_micropost_path(@micropost.id), micropost: @micropost.as_json, format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(403)
-      end
+      it_returns_status(403)
     end
 
     context "wih ownership" do
@@ -81,21 +80,20 @@ describe Api::V1::MicropostsController, type: :api do
         put api_v1_micropost_path(@micropost.id), micropost: @micropost.as_json, format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(200)
-      end
+      it_returns_status(200)
 
-      it 'returns the correct location' do
-        expect(last_response.headers['Location'])
-          .to include(api_v1_micropost_path(@micropost.id))
-      end
+      it_includes_in_headers({Location: 'api_v1_micropost_path(@micropost.id)'})
 
-      it 'returns the data in the body' do
-        micropost = Micropost.last!
-        body = HashWithIndifferentAccess.new(MultiJson.load(last_response.body))
-        expect(body[:micropost][:content]).to eql(@micropost.content)
-        expect(body[:micropost][:updated_at]).to eql(micropost.updated_at.iso8601)
-      end
+      it_returns_attributes(resource: 'micropost', model: '@micropost', only: [
+        :content, :user_id
+      ])
+
+      it_returns_more_attributes(
+        resource: 'micropost',
+        model: 'Micropost.last!',
+        only: [:updated_at, :created_at],
+        modifier: 'iso8601'
+      )
     end
   end
 
@@ -107,9 +105,7 @@ describe Api::V1::MicropostsController, type: :api do
         delete api_v1_micropost_path(rand(100..1000)), format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(404)
-      end
+      it_returns_status(404)
     end
 
     context 'when the resource does exist' do
@@ -120,9 +116,7 @@ describe Api::V1::MicropostsController, type: :api do
         delete api_v1_micropost_path(@micropost.id), format: :json
       end
 
-      it 'returns the correct status' do
-        expect(last_response.status).to eql(204)
-      end
+      it_returns_status(204)
 
       it 'actually deletes the resource' do
         expect(Micropost.find_by(id: @micropost.id)).to eql(nil)
