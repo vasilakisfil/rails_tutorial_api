@@ -1,25 +1,49 @@
 class UserPolicy < ApplicationPolicy
-  def show?
-    return true
+  def create?
+    return Admin.new(record) if user && user.admin?
+    return Regular.new(record) if user
+    return Guest.new(record)
   end
 
-  def create?
-    return true
+  def show?
+    raise Pundit::NotAuthorizedError unless user
+
+    return Admin.new(record) if user&.admin?
+    return Owner.new(record) if user&.id == record.id
+    return Regular.new(record) if user
+    return Guest.new(record)
   end
 
   def update?
-    return true if user.admin?
-    return true if record.id == user.id
+    raise Pundit::NotAuthorizedError unless user
+
+    return Admin.new(record) if user&.admin?
+    return Owner.new(record) if user&.id == record&.id
+    raise Pundit::NotAuthorizedError
   end
 
   def destroy?
-    return true if user.admin?
-    return true if record.id == user.id
+    return Admin.new(record) if user&.admin?
+    return Owner.new(record) if user&.id == record.id
   end
 
-  class Scope < ApplicationPolicy::Scope
+  class Scope < Scope
     def resolve
-      scope.all
+      return Admin.new(scope, User) if user&.admin?
+      return Regular.new(scope, User) if user
+      return Guest.new(scope, User)
     end
+  end
+
+  class Admin < DefaultPermissions
+  end
+
+  class Owner < Admin
+  end
+
+  class Regular < Owner
+  end
+
+  class Guest < Regular
   end
 end

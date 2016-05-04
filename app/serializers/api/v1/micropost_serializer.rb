@@ -1,5 +1,5 @@
 class Api::V1::MicropostSerializer < Api::V1::BaseSerializer
-  attributes :id, :content, :picture, :created_at, :updated_at
+  attributes(*Micropost.attribute_names.map(&:to_sym))
 
   has_one :user
 

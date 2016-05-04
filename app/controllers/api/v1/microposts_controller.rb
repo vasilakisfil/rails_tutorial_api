@@ -1,87 +1,70 @@
 class Api::V1::MicropostsController < Api::V1::BaseController
-  before_filter :authenticate_user!
+  before_action :load_resource
 
   def index
-
-    # ember optimization
-    # we could have another point for the feed but then we would have some microposts
-    # 2 times in browser's memory
-    if params[:feed]
-      return api_error(status: 422) if params[:feed_user_id].blank?
-      return unauthorized! unless current_user.id == params[:feed_user_id].to_i
-
-      microposts = User.find_by(id: params[:feed_user_id]).feed
-    else
-      microposts = Micropost.where(user_id: params[:user_id])
-    end
-
-    microposts = apply_filters(microposts, params)
-
-    microposts = paginate(microposts)
-
-    microposts = policy_scope(microposts)
+    auth_microposts = policy_scope(@microposts)
 
     render(
-      json: ActiveModel::ArraySerializer.new(
-        microposts,
-        each_serializer: Api::V1::MicropostSerializer,
-        root: 'microposts',
-        meta: meta_attributes(microposts)
-      )
+      json: auth_microposts.collection,
+      each_serializer: Api::V1::MicropostSerializer,
+      #meta: meta_attributes(microposts)
     )
   end
 
   def show
-    micropost = Micropost.find(params[:id])
-    authorize micropost
+    auth_micropost = authorize_with_permissions(@micropost)
 
-    render json: Api::V1::MicropostSerializer.new(micropost).to_json
+    render json: auth_micropost.record, serializer: Api::V1::MicropostSerializer.new(micropost)
   end
 
   def create
-    micropost = Micropost.new(create_params)
-    return api_error(status: 422, errors: micropost.errors) unless micropost.valid?
+    auth_micropost = authorize_with_permissions(@micropost, :create?)
 
-    micropost.save!
-
-    render(
-      json: Api::V1::MicropostSerializer.new(micropost).to_json,
-      status: 201,
-      location: api_v1_micropost_path(micropost.id),
-      serializer: Api::V1::MicropostSerializer
-    )
+    if @micropost.save
+      render json: auth_micropost.record, serializer: Api::V1::MicropostSerializer,
+        status: 201
+    else
+      invalid_resource!(@micropost.errors)
+    end
   end
 
   def update
-    micropost = Micropost.find(params[:id])
+    auth_micropost = authorize_with_permissions(@micropost)
 
-    authorize micropost
-
-    if !micropost.update_attributes(update_params)
-      return api_error(status: 422, errors: micropost.errors)
+    if !@micropost.update_attributes(update_permitted_params)
+      invalid_resource!(@micropost.errors)
     end
 
-    render(
-      json: Api::V1::MicropostSerializer.new(micropost).to_json,
-      status: 200,
-      location: api_v1_micropost_path(micropost.id),
-      serializer: Api::V1::MicropostSerializer
-    )
+    render json: auth_micropost, serializer: Api::V1::MicropostSerializer
   end
 
   def destroy
-    micropost = Micropost.find(params[:id])
+    auth_micropost = authorize_with_permissions(@micropost)
 
-    authorize micropost
-
-    if !micropost.destroy
+    if !@micropost.destroy
       return api_error(status: 500)
     end
 
-    head status: 204
+    render json: auth_micropost.record, serializer: Api::V1::UserSerializer
   end
 
   private
+
+  def load_resource
+    case params[:action].to_sym
+    when :index
+      @micropost = paginage(apply_filters(Micropost.all, index_permitted_params))
+    when :show, :update, :destroy
+      @micropost = Micropost.find(params[:id])
+    when :create
+      @micropost = Micropost.new(create_permitted_params)
+    end
+  end
+
+
+  def index_params
+    params
+  end
 
   def create_params
      params.require(:micropost).permit(

@@ -1,3 +1,1 @@
-ActiveModel::Serializer.setup do |config|
-  config.embed = :ids
-end
+ActiveModelSerializers.config.adapter = :json_api

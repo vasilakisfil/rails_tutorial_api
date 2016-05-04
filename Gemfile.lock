@@ -23,6 +23,15 @@ GIT
     rspec-api_helpers (0.2.1)
 
 GIT
+  remote: git://github.com/rails-api/active_model_serializers.git
+  revision: 2b4989935130732d59d7cc1b6228d4a447dd5071
+  specs:
+    active_model_serializers (0.10.0.rc5)
+      actionpack (>= 4.0)
+      activemodel (>= 4.0)
+      railties (>= 4.0)
+
+GIT
   remote: git@github.com:ctran/annotate_models.git
   revision: 93318a5eb219de1cdd74fea25957e5ab744ead91
   branch: develop
@@ -53,8 +62,6 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    active_model_serializers (0.9.2)
-      activemodel (>= 3.2)
     activejob (4.2.6)
       activesupport (= 4.2.6)
       globalid (>= 0.3.0)
@@ -198,6 +205,7 @@ GEM
       ruby-progressbar
     multi_json (1.11.3)
     nenv (0.3.0)
+    net-ssh (2.9.1)
     newrelic_rpm (3.15.2.317)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
@@ -330,7 +338,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_hash_relation!
-  active_model_serializers (= 0.9.2)
+  active_model_serializers!
   annotate!
   arel (~> 6.0.0)
   bcrypt (~> 3.1.7)
@@ -351,12 +359,13 @@ DEPENDENCIES
   mini_backtrace (= 0.1.3)
   mini_magick (~> 3.8.0)
   minitest-reporters (= 1.0.5)
+  net-ssh
   newrelic_rpm
   pg
   pry-rails
   pundit (~> 0.3.0)
   rack-cors
-  rails (~> 4.2.0)
+  rails (~> 4.2.6)
   rails_12factor (= 0.0.2)
   redis-throttle!
   rspec-api_helpers!

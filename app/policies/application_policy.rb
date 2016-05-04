@@ -7,19 +7,27 @@ class ApplicationPolicy
   end
 
   def index?
-    false
+    true
   end
 
   def show?
-    scope.where(:id => record.id).exists?
+    scope.where(id: record.id).exists?
   end
 
   def create?
     false
   end
 
+  def new?
+    create?
+  end
+
   def update?
     false
+  end
+
+  def edit?
+    update?
   end
 
   def destroy?
@@ -39,7 +47,21 @@ class ApplicationPolicy
     end
 
     def resolve
-      scope.none
+      scope
     end
   end
+
+  class DefaultPermissions
+    include FlexiblePermissions::RoleMethods
+
+    class Fields
+      include FlexiblePermissions::SparsedFieldMethods
+    end
+
+    class Includes
+      include FlexiblePermissions::SparsedIncludeMethods
+    end
+  end
+
 end
+
