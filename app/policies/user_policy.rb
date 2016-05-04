@@ -6,8 +6,6 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    raise Pundit::NotAuthorizedError unless user
-
     return Admin.new(record) if user&.admin?
     return Owner.new(record) if user&.id == record.id
     return Regular.new(record) if user
@@ -23,6 +21,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
+    raise Pundit::NotAuthorizedError unless user
+
     return Admin.new(record) if user&.admin?
     return Owner.new(record) if user&.id == record.id
   end

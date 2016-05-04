@@ -14,7 +14,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def show
     auth_micropost = authorize_with_permissions(@micropost)
 
-    render json: auth_micropost.record, serializer: Api::V1::MicropostSerializer.new(micropost)
+    render json: auth_micropost.record, serializer: Api::V1::MicropostSerializer
   end
 
   def create
@@ -31,7 +31,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def update
     auth_micropost = authorize_with_permissions(@micropost)
 
-    if !@micropost.update_attributes(update_permitted_params)
+    if !@micropost.update_attributes(update_params)
       invalid_resource!(@micropost.errors)
     end
 
@@ -53,11 +53,11 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def load_resource
     case params[:action].to_sym
     when :index
-      @micropost = paginage(apply_filters(Micropost.all, index_permitted_params))
+      @microposts = apply_filters(Micropost.all, index_params)
     when :show, :update, :destroy
       @micropost = Micropost.find(params[:id])
     when :create
-      @micropost = Micropost.new(create_permitted_params)
+      @micropost = Micropost.new(created_params)
     end
   end
 
