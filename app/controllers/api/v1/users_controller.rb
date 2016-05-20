@@ -62,11 +62,15 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def index_params
-    params
+    params.permit(:email, :name)
   end
 
   def create_params
-    params
+    prms = ActiveModelSerializers::Deserialization.jsonapi_parse(params, {
+      only: [:email, :name, :password]
+    })
+
+    return prms.merge(password_confirmation: prms[:password])
   end
 
   def update_params

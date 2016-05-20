@@ -41,7 +41,7 @@ class Api::V1::BaseController < ApplicationController
     end
     head status: status and return if errors.empty?
 
-    render json: jsonapi_format(errors).to_json, status: status
+    render json: {errors: jsonapi_format(errors)}, status: status
   end
 
   def paginate(resource)
@@ -81,16 +81,11 @@ class Api::V1::BaseController < ApplicationController
 
   #ember specific :/
   def jsonapi_format(errors)
-    return errors if errors.is_a? String
-    errors_hash = {}
-    errors.messages.each do |attribute, error|
-      array_hash = []
-      error.each do |e|
-        array_hash << {attribute: attribute, message: e}
-      end
-      errors_hash.merge!({ attribute => array_hash })
+    errors.messages.map do |k, v|
+      {
+        source: {pointer: "data/attributes/#{k}"},
+        detail: v.join(' and ')
+      }
     end
-
-    return errors_hash
   end
 end

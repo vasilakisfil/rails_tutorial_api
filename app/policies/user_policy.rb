@@ -6,8 +6,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    return Admin.new(record) if user&.admin?
-    return Owner.new(record) if user&.id == record.id
+    return Admin.new(record) if user.try(:admin?)
+    return Owner.new(record) if user.try(:id) == record.id
     return Regular.new(record) if user
     return Guest.new(record)
   end
@@ -15,21 +15,21 @@ class UserPolicy < ApplicationPolicy
   def update?
     raise Pundit::NotAuthorizedError unless user
 
-    return Admin.new(record) if user&.admin?
-    return Owner.new(record) if user&.id == record&.id
+    return Admin.new(record) if user.try(:admin?)
+    return Owner.new(record) if user.try(:id) == record.try(:id)
     raise Pundit::NotAuthorizedError
   end
 
   def destroy?
     raise Pundit::NotAuthorizedError unless user
 
-    return Admin.new(record) if user&.admin?
-    return Owner.new(record) if user&.id == record.id
+    return Admin.new(record) if user.try(:admin?)
+    return Owner.new(record) if user.try(:id) == record.id
   end
 
   class Scope < Scope
     def resolve
-      return Admin.new(scope, User) if user&.admin?
+      return Admin.new(scope, User) if user.try(:admin?)
       return Regular.new(scope, User) if user
       return Guest.new(scope, User)
     end
