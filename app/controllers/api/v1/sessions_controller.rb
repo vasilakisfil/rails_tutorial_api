@@ -8,7 +8,7 @@ class Api::V1::SessionsController < Api::V1::BaseController
         status: 201
       )
     else
-      return api_error(status: 401)
+      return api_error(status: 401, errors: 'Wrong username or password')
     end
   end
 

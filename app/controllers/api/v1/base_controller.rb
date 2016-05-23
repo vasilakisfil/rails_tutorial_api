@@ -81,6 +81,10 @@ class Api::V1::BaseController < ApplicationController
 
   #ember specific :/
   def jsonapi_format(errors)
+    if errors.is_a? String
+      return [{source: {pointer: 'data'}, detail: errors}]
+    end
+
     errors.messages.map do |k, v|
       {
         source: {pointer: "data/attributes/#{k}"},

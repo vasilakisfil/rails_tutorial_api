@@ -67,9 +67,9 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   end
 
   def create_params
-     params.require(:micropost).permit(
-       :content, :picture, :user_id
-     )
+    ActiveModelSerializers::Deserialization.jsonapi_parse(params, {
+      only: [:content, :picture, :user_id]
+    })
   end
 
   def update_params

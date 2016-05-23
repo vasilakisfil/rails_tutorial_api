@@ -41,6 +41,7 @@ Rails.application.routes.draw do
             add_relationship_links.call
           end
         end
+        resource :feed, only: [:show]
       end
       resources :microposts, only: [:index, :create, :show, :update, :destroy]
       resources :sessions, only: [:create]
