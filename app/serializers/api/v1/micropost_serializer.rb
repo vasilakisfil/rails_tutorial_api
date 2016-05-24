@@ -1,7 +1,7 @@
 class Api::V1::MicropostSerializer < Api::V1::BaseSerializer
   attributes(*Micropost.attribute_names.map(&:to_sym))
 
-  has_one :user
+  belongs_to :user, serializer: Api::V1::UserSerializer
 
   def picture
     object.picture.url

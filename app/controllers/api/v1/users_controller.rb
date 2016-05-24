@@ -6,7 +6,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
     render(
       json: auth_users.collection,
-      each_serializer: Api::V1::UserSerializer,
+      each_serializer: Api::V1::UserSerializer
       # meta: meta_attributes(auth_users)
     )
   end

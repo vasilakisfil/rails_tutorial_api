@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   include Pundit
   include ActiveHashRelation
+  include Pagination
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
