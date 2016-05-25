@@ -21,6 +21,6 @@ class Api::V1::FeedsController < Api::V1::BaseController
   end
 
   def index_params
-    params
+    params.except(:user_id)
   end
 end

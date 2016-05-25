@@ -1,29 +1,15 @@
-class Api::V1::Links::FollowingController < Api::V1::BaseController
-  before_filter :authenticate_user!
+class Api::V1::FollowingController < Api::V1::BaseController
+  before_action :load_resource
 
   #collection
   def index
-    following = User.find(params[:user_id]).following
-
-    following = paginate(following)
+    auth_following = policy_scope(@following)
 
     render(
-      json: ActiveModel::ArraySerializer.new(
-        following,
-        each_serializer: Api::V1::UserSerializer,
-        root: 'following',
-        meta: meta_attributes(following)
-      )
+      json: auth_following.collection,
+      each_serializer: Api::V1::UserSerializer,
+      meta: meta_attributes(auth_following.collection)
     )
-  end
-
-  #collection
-  def update
-    authorize User.find(params[:user_id])
-
-    User.find(params[:user_id]).following = params[:following_ids]
-
-    head status: 204
   end
 
   #member
@@ -57,5 +43,19 @@ class Api::V1::Links::FollowingController < Api::V1::BaseController
     User.find(params[:user_id]).unfollow(User.find(params[:id]))
 
     head status: 204
+  end
+
+  def load_resource
+    case params[:action].to_sym
+    when :index
+      @following = paginate(
+        apply_filters(User.find(params[:user_id]).following, index_params)
+      )
+    end
+  end
+
+  def index_params
+    params[:id] = params[:following_id] if params[:following_id]
+    params
   end
 end

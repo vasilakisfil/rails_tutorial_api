@@ -17,32 +17,24 @@ Rails.application.routes.draw do
   resources :microposts,          only: [:create, :destroy]
   resources :relationships,       only: [:create, :destroy]
 
-  add_relationship_links = Proc.new do
-    collection do
-      get :index
-      put :update
-    end
-    member do
-      post :create
-      get :show
-      delete :destroy
-    end
-  end
-
-  #api
   namespace :api do
     namespace :v1 do
       resources :users, only: [:index, :create, :show, :update, :destroy] do
-        namespace :links do
-          resources :followers, only: [] do
-            add_relationship_links.call
-          end
-          resources :following, only: [] do
-            add_relationship_links.call
+        resources :followers, only: [:index, :show] do
+          member do
+            post :create
+            delete :destroy
           end
         end
-        resource :feed, only: [:show]
+
+        resources :following, only: [:index, :show] do
+          member do
+            post :create
+            delete :destroy
+          end
+        end
       end
+      resource :feed, only: [:show]
       resources :microposts, only: [:index, :create, :show, :update, :destroy]
       resources :sessions, only: [:create]
     end

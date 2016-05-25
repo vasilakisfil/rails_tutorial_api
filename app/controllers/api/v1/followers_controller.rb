@@ -1,29 +1,15 @@
-class Api::V1::Links::FollowersController < Api::V1::BaseController
-  before_filter :authenticate_user!
+class Api::V1::FollowersController < Api::V1::BaseController
+  before_action :load_resource
 
   #collection
   def index
-    followers = User.find(params[:user_id]).followers
-
-    followers = paginate(followers)
+    auth_followers = policy_scope(@followers)
 
     render(
-      json: ActiveModel::ArraySerializer.new(
-        followers,
-        each_serializer: Api::V1::UserSerializer,
-        root: 'followers',
-        meta: meta_attributes(followers)
-      )
+      json: auth_followers.collection,
+      each_serializer: Api::V1::UserSerializer,
+      meta: meta_attributes(auth_followers.collection)
     )
-  end
-
-  #collection
-  def update
-    authorize User.find(params[:user_id])
-
-    User.find(params[:user_id]).followers = params[:follower_ids]
-
-    head status: 204
   end
 
   #member
@@ -57,5 +43,21 @@ class Api::V1::Links::FollowersController < Api::V1::BaseController
     User.find(params[:id]).unfollow(User.find(params[:user_id]))
 
     head status: 204
+  end
+
+  def load_resource
+    return invalid_resource!('missing user_id') if params[:user_id].blank?
+
+    case params[:action].to_sym
+    when :index
+      @followers = paginate(
+        apply_filters(User.find(params[:user_id]).followers, index_params)
+      )
+    end
+  end
+
+  def index_params
+    params[:id] = params[:follower_id] if params[:follower_id]
+    params
   end
 end

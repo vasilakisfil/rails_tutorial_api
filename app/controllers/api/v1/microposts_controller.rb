@@ -34,7 +34,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     auth_micropost = authorize_with_permissions(@micropost)
 
     if @micropost.update_attributes(update_params)
-      render json: auth_micropost, serializer: Api::V1::MicropostSerializer,
+      render json: auth_micropost.record, serializer: Api::V1::MicropostSerializer,
         include: ['*']
     else
       invalid_resource!(@micropost.errors)
@@ -64,7 +64,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
     when :show, :update, :destroy
       @micropost = Micropost.find(params[:id])
     when :create
-      @micropost = Micropost.new(created_params)
+      @micropost = Micropost.new(create_params)
     end
   end
 
@@ -75,8 +75,8 @@ class Api::V1::MicropostsController < Api::V1::BaseController
 
   def create_params
     ActiveModelSerializers::Deserialization.jsonapi_parse(params, {
-      only: [:content, :picture, :user_id]
-    })
+      only: [:content, :picture]
+    }).merge(user_id: current_user.id)
   end
 
   def update_params
