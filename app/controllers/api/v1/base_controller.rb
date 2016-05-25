@@ -8,6 +8,7 @@ class Api::V1::BaseController < ApplicationController
   protect_from_forgery with: :null_session
 
   before_action :destroy_session
+  before_action :authenticate_user
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found!
   rescue_from Pundit::NotAuthorizedError, with: :unauthorized!
@@ -45,27 +46,18 @@ class Api::V1::BaseController < ApplicationController
     render json: {errors: jsonapi_format(errors)}, status: status
   end
 
-  def paginate(resource)
-    resource = resource.page(params[:page] || 1)
-    if params[:per_page]
-      resource = resource.per_page(params[:per_page])
-    end
-
-    return resource
-  end
-
   #expects pagination!
   def meta_attributes(object)
     {
       current_page: object.current_page,
       next_page: object.next_page,
-      prev_page: object.previous_page,
+      prev_page: object.prev_page,
       total_pages: object.total_pages,
-      total_count: object.total_entries
+      total_count: object.total_count
     }
   end
 
-  def authenticate_user!
+  def authenticate_user
     token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
 
     user_email = options.blank?? nil : options[:email]
@@ -74,7 +66,7 @@ class Api::V1::BaseController < ApplicationController
     if user && ActiveSupport::SecurityUtils.secure_compare(user.authentication_token, token)
       @current_user = user
     else
-      return unauthenticated!
+      return nil #unauthenticated!
     end
   end
 

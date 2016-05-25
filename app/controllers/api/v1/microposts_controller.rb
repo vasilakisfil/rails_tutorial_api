@@ -33,12 +33,12 @@ class Api::V1::MicropostsController < Api::V1::BaseController
   def update
     auth_micropost = authorize_with_permissions(@micropost)
 
-    if !@micropost.update_attributes(update_params)
+    if @micropost.update_attributes(update_params)
+      render json: auth_micropost, serializer: Api::V1::MicropostSerializer,
+        include: ['*']
+    else
       invalid_resource!(@micropost.errors)
     end
-
-    render json: auth_micropost, serializer: Api::V1::MicropostSerializer,
-      include: ['*']
   end
 
   def destroy
@@ -60,7 +60,7 @@ class Api::V1::MicropostsController < Api::V1::BaseController
 
     case params[:action].to_sym
     when :index
-      @microposts = custom_paginate(apply_filters(Micropost.all, index_params))
+      @microposts = paginate(apply_filters(Micropost.all, index_params))
     when :show, :update, :destroy
       @micropost = Micropost.find(params[:id])
     when :create

@@ -44,7 +44,7 @@ class User < ActiveRecord::Base
   has_secure_password
   validates :password, length: { minimum: 6 }, allow_blank: true
 
-  validates :password_confirmation, :presence => true, :if => '!password.nil?'
+  validates :password_confirmation, :presence => true, :if => '!password.blank?'
 
   # Returns the hash digest of the given string.
   def User.digest(string)

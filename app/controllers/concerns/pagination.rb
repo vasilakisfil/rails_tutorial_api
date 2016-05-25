@@ -2,7 +2,7 @@ module Pagination
   extend ActiveSupport::Concern
 
   included do
-    def custom_paginate(resource)
+    def paginate(resource)
       default_per_page = 10 #Rails.application.secrets.default_per_page
 
       case resource
