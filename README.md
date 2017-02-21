@@ -2,6 +2,9 @@
 
 [![circleci build](https://circleci.com/gh/vasilakisfil/rails_tutorial_api.svg?style=shield&circle-token=b3c068bc50b4672f403bbebe0c8dc4152cc275c4)](https://circleci.com/gh/vasilakisfil/rails_tutorial_api)
 
+**This repo is deprecated and not actively maintained.
+A new [Rails tutorial](https://github.com/vasilakisfil/rails5_api_tutorial) has been released based on Rails 5. The equivelant EmberJS app can be found [here](https://github.com/vasilakisfil/ember_on_rails5).**
+
 This is the sample application for the
 [*Ruby on Rails Tutorial:
 Learn Web Development with Rails*](http://www.railstutorial.org/)
